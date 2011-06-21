@@ -1,5 +1,6 @@
 -- Waveguide.hs
 -- file which contains code for the Waveguide data type.
+module Waveguide where
 
 -- a data type which encodes the aspect that the waveguide actually takes
 data Aspect = Circular | Rectangular
