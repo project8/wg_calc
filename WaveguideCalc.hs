@@ -1,7 +1,13 @@
+import Waveguide
+
 -- converts an integer number of mils to
 -- meters
 mil_to_m :: Int -> Float
 mil_to_m x = 0.0000254 * (fromIntegral x)
+
+-- calculates the wavenumber of a given frequency
+r_wavenumber :: Float -> Float
+r_wavenumber f = (2 * pi * f) / 299792458.0
 
 -- given rectangular waveguide dimensions, this calculates the
 -- cutoff wavenumber for a given mode
@@ -35,4 +41,7 @@ r_cutoff_f broadDim shortDim broadIdx shortIdx =
     
 -- print the TE10 mode cutoff for WR42 waveguide
 main = do
-  putStrLn $ show $ r_cutoff_f 420 170 1 0
+  putStrLn $ (show $ 100 * guide_wl) ++ 
+    "cm/" ++ (show $ 1000 * 0.25 * guide_wl) ++ "mm"
+  where
+    guide_wl = (/) (2 * pi) $ r_beta 470 120 1 0 $ r_wavenumber 26.0e9
