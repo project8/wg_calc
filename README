@@ -1,0 +1,12 @@
+All of the calculations which were done supporting the waveguide design
+are performed by this program and printed to screen. 
+
+Currently, two things are calculated:
+1) The guide wavelength for the TE10 mode at 26.0 GHz, and the 
+   quarter guide wavelength.  This parameter is important for
+   designing the overall length of the active region, as well as
+   the distance from the trap region to the gas inlets.
+
+2) A calculation which finds the minimum length of the gas inlets
+   such that they act as >20dB attenuators when coupling to the gas
+   tubes.
