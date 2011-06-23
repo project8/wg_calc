@@ -17,6 +17,22 @@ r_cutoff_n broadDim shortDim broadIdx shortIdx =
   where
     sqFirstTerm = (fromIntegral broadIdx) / (mil_to_m broadDim)
     sqSecondTerm = (fromIntegral shortIdx) / (mil_to_m shortDim)
+    
+-- given circular waveguide radius in mils, this calculates the cutoff 
+-- wavenumber for a given n,m
+c_cutoff_n :: Int -> Int -> Int -> Float
+c_cutoff_n circRadius idxN idxM = (c_cutoff_n' idxN idxM) / circRadiusM
+  where
+    circRadiusM = mil_to_m circRadius
+    c_cutoff_n' 0 1 = 3.832
+    c_cutoff_n' 0 2 = 7.016
+    c_cutoff_n' 0 3 = 10.174
+    c_cutoff_n' 1 1 = 1.841
+    c_cutoff_n' 1 2 = 5.331
+    c_cutoff_n' 1 3 = 8.536
+    c_cutoff_n' 2 1 = 3.054
+    c_cutoff_n' 2 2 = 6.706
+    c_cutoff_n' 2 3 = 9.970
 
 -- given rectangular waveguide dimensions, returns the propagation
 -- constant for a given mode
@@ -41,7 +57,13 @@ r_cutoff_f broadDim shortDim broadIdx shortIdx =
     
 -- print the TE10 mode cutoff for WR42 waveguide
 main = do
+  putStrLn "The guide full/quarter wavelengths for 26GHz TE10 (WR42):"
   putStrLn $ (show $ 100 * guide_wl) ++ 
     "cm/" ++ (show $ 1000 * 0.25 * guide_wl) ++ "mm"
+  putStrLn "\n99% TE11 attenuation length in 3/32 gas inlet at 26GHz"
+  putStrLn $ (show minLength) ++ " mils"
   where
     guide_wl = (/) (2 * pi) $ r_beta 470 120 1 0 $ r_wavenumber 26.0e9
+    minLength = fst $ head $ dropWhile (\(_,y) -> y > 1e-2) attPairs
+    attPairs = [(x,exp(-1.0 * (mil_to_m x) * 557.1909)) 
+               | x <- [400,410..1000]]
