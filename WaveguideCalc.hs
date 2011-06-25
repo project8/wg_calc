@@ -59,7 +59,7 @@ r_cutoff_f broadDim shortDim broadIdx shortIdx =
 main = do
   putStrLn "The guide full/quarter wavelengths for 26GHz TE10 (WR42):"
   putStrLn $ (show $ 100 * guide_wl) ++ 
-    "cm/" ++ (show $ 1000 * 0.25 * guide_wl) ++ "mm"
+    "cm / " ++ (show $ 1000 * 0.25 * guide_wl) ++ "mm"
   putStrLn "\n99% TE11 attenuation length in 3/32 gas inlet at 26GHz"
   putStrLn $ (show minLength) ++ " mils"
   where
