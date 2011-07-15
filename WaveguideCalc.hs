@@ -60,10 +60,10 @@ main = do
   putStrLn "The guide full/quarter wavelengths for 26GHz TE10 (WR42):"
   putStrLn $ (show $ 100 * guide_wl) ++ 
     "cm/" ++ (show $ 1000 * 0.25 * guide_wl) ++ "mm"
-  putStrLn "\n99% TE11 attenuation length in 3/32 gas inlet at 26GHz"
+  putStrLn "\n99% TE11 attenuation length in 1/64 gas inlet at 26GHz"
   putStrLn $ (show minLength) ++ " mils"
   where
     guide_wl = (/) (2 * pi) $ r_beta 470 120 1 0 $ r_wavenumber 26.0e9
     minLength = fst $ head $ dropWhile (\(_,y) -> y > 1e-2) attPairs
-    attPairs = [(x,exp(-1.0 * (mil_to_m x) * 557.1909)) 
-               | x <- [400,410..1000]]
+    attPairs = [(x,exp(-1.0 * (mil_to_m x) * 5801.1963)) 
+               | x <- [10,20..1000]]
