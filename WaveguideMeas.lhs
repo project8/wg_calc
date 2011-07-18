@@ -3,6 +3,19 @@ pieces.  In particular, we have been designing and re-designing the
 inlet sections for the waveguide active region in an attempt to optimize
 the insertion loss (IL) of the inlets.
 
+It was found that the insertion loss of the inlet was a smoothly varying
+function of frequency over the 25000 - 26500MHz band.  As a consequence,
+the average insertion loss over said band was calculated as the figure 
+of merit.  
+
+The average IL for the gas inlet version 2 is ~.22dB wrt to a blank 
+aluminum waveguide section of otherwise identical dimensions.  This 
+corresponds to an effective transmission coefficient of |T| = 0.95.
+
+----------------
+-- Begin Code --
+----------------
+
 The following data was taken on 7/14/2011.  The format is in a list
 of (frequency, power_bare, power_blank, power_inlet).  There are functions
 to pull off these components.
@@ -67,4 +80,4 @@ and print it out.
 
 > main = do
 >  putStrLn "avg. inlet IL over band 25 - 26.5GHz in dB:"
->  putStrLn $ show . average . il_wrt_blank $ points
+>  putStrLn . show . average . il_wrt_blank $ points
