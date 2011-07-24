@@ -1,31 +1,56 @@
--- Bore radius
-boreRadius :: Int
-boreRadius = 1175
+-- Utility functions such as integer square root, etc etc
+import qualified WaveguideUtils as WU
+import qualified WaveguideParameters as WP
+import qualified MagnetParameters as MP
 
--- These functions return the dimensions of the amplifier.  NOT FREE.
-ampWidth :: Int
-ampWidth = 1800
+-- A parameterization of the magnet bore.
+data MagnetBore = MagnetBore {boreRadius :: Integer} deriving Show
 
-ampLength :: Int
-ampLength = 1100
+-- The detector can be characterized by a handful of physical parameters.
+data Detector = Detector {ampWidth :: Integer,
+                          ampLength :: Integer,
+                          ampDepth :: Integer,
+                          castBendCenterline :: Integer}              
+              deriving Show
 
-ampDepth :: Int
-ampDepth = 500
+-- Just a convenient 2-d point representation
+data Position = Position {x :: Integer, y :: Integer} deriving (Show, Eq)
 
--- The radius of the cast bends as made by Penn engineering.
-castBendRadius :: Int
-castBendRadius = 170
-
--- The radius of WR42 flanges
-wr42FlangeRadius :: Int
-wr42FlangeRadius = 438
-
--- Returns the position of the corner with the depth of the plate, the
--- top of the amplifier, and the bending radius of the copper spring.
-rCorner :: Int -> Int -> Int -> Int
-rCorner plateDepth ampSurface springRadius = floor . sqrt $ x^2 + y^2
+-- Want to add two positions?
+(+++) :: Position -> Position -> Position
+(+++) (Position {x=x1,y=y1}) (Position {x=x2,y=y2}) = addedPos
   where
-    x = fromIntegral (plateDepth + ampSurface + springRadius + ampDepth)
-    y = (fromIntegral ampWidth/2.0)
+    addedPos = (Position {x=x1+x2,y=y1+y2})
     
--- Returns the distance from the G10 bore for a given set of dimensions
+-- Converts from 2-d position to radius
+posRadius :: Position -> Integer
+posRadius Position {x = ex, y = ey} = WU.iSqrt (ex^2 + ey^2)
+
+-- Calculates the "height" of the detector, from the bottom of the 
+-- amplifier to the top of the active region.
+detectorHeight :: Detector -> Integer
+detectorHeight d = h
+  where
+    h = (ampDepth d) + (castBendCenterline d) + (WP.wr42FlangeHalfHeight)
+    
+-- A detector is "compatible" with a bore if when the amplifier corners
+-- are touching the inner bore, the active region is more than 50 mils
+-- from the bore wall.
+compatible :: Detector -> MagnetBore -> Bool
+compatible d (MagnetBore {boreRadius = r}) 
+  | ((2*r) - y_base) > (detectorHeight d + 100) = True
+  | otherwise           = False                           
+    where
+      y_base = WU.iSqrt (r^2 - (quot (ampWidth d) 4)^2)
+      
+-- Tell us the answer!            
+main :: IO ()
+main = do
+  putStrLn . show $ willItWork
+  where
+    willItWork = compatible detector bore
+    detector = Detector {ampWidth = WP.kh3Width, 
+                         ampLength = WP.kh3Length, 
+                         ampDepth = WP.kh3Depth, 
+                         castBendCenterline = 0}
+    bore = MagnetBore {boreRadius = MP.stdBoreRadius}
