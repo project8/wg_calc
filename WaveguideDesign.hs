@@ -23,7 +23,7 @@ detectorHeight d = h
 -- Calculates the position of the base of the amplifier when the corners    
 -- of the amp are touching the G10 bore.
 ampCornerPoint :: Detector -> MagnetBore -> Integer    
-ampCornerPoint d b = WU.leg (boreRadius b) (quot (ampWidth d) 4)
+ampCornerPoint d b = WU.leg (boreRadius b) (quot (ampWidth d) 2)
     
 -- A detector is "compatible" with a bore if when the amplifier corners
 -- are touching the inner bore, the active region is more than tol mils
@@ -33,16 +33,30 @@ compatible d b tol
   | headroom d b + tol < 0 = True
   | otherwise              = False                           
       
--- Calculates the available headroom for a detector in a bore      
+-- Calculates the available headroom for a detector in a bore, which is
+-- the distance from the G10 bore to the top of the active region.
 headroom :: Detector -> MagnetBore -> Integer     
-headroom d b = (detectorHeight d) - (ampCornerPoint d b) - (boreRadius b)
+headroom d b
+  | fit > 0 = 0
+  | otherwise = fit
+    where
+      fit = (detectorHeight d) - (ampCornerPoint d b) - (boreRadius b)
+      
+-- Calculates the position of the trap for a set of given dimensions      
+detectorTrapPosition :: Detector -> MagnetBore -> Integer
+detectorTrapPosition d b
+  | clear < 0 = (boreRadius b) + clear - (WP.wr42FlangeHalfHeight)
+  | otherwise = error "detector is too big!"
+    where
+      clear = headroom d b
                 
 -- Tell us the answer!            
 main :: IO ()
 main = do
+  putStrLn . show $ detectorTrapPosition detector bore
   putStrLn . show $ willItWork
   where
-    willItWork = compatible detector bore 200
+    willItWork = compatible detector bore 500
     detector = Detector {ampWidth = WP.kh3Width, 
                          ampLength = WP.kh3Length, 
                          ampDepth = WP.kh3Depth, 
