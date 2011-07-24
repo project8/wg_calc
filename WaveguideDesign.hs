@@ -13,19 +13,6 @@ data Detector = Detector {ampWidth :: Integer,
                           castBendCenterline :: Integer}              
               deriving Show
 
--- Just a convenient 2-d point representation
-data Position = Position {x :: Integer, y :: Integer} deriving (Show, Eq)
-
--- Want to add two positions?
-(+++) :: Position -> Position -> Position
-(+++) (Position {x=x1,y=y1}) (Position {x=x2,y=y2}) = addedPos
-  where
-    addedPos = (Position {x=x1+x2,y=y1+y2})
-    
--- Converts from 2-d position to radius
-posRadius :: Position -> Integer
-posRadius Position {x = ex, y = ey} = WU.hyp ex ey
-
 -- Calculates the "height" of the detector, from the bottom of the 
 -- amplifier to the top of the active region.
 detectorHeight :: Detector -> Integer
