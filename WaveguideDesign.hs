@@ -24,7 +24,7 @@ data Position = Position {x :: Integer, y :: Integer} deriving (Show, Eq)
     
 -- Converts from 2-d position to radius
 posRadius :: Position -> Integer
-posRadius Position {x = ex, y = ey} = WU.iSqrt (ex^2 + ey^2)
+posRadius Position {x = ex, y = ey} = WU.hyp ex ey
 
 -- Calculates the "height" of the detector, from the bottom of the 
 -- amplifier to the top of the active region.
@@ -41,7 +41,7 @@ compatible d (MagnetBore {boreRadius = r})
   | ((2*r) - y_base) > (detectorHeight d + 100) = True
   | otherwise           = False                           
     where
-      y_base = WU.iSqrt (r^2 - (quot (ampWidth d) 4)^2)
+      y_base = WU.leg r (quot (ampWidth d) 4)
       
 -- Tell us the answer!            
 main :: IO ()
