@@ -33,24 +33,31 @@ detectorHeight d = h
   where
     h = (ampDepth d) + (castBendCenterline d) + (WP.wr42FlangeHalfHeight)
     
+-- Calculates the position of the base of the amplifier when the corners    
+-- of the amp are touching the G10 bore.
+ampCornerPoint :: Detector -> MagnetBore -> Integer    
+ampCornerPoint d b = WU.leg (boreRadius b) (quot (ampWidth d) 4)
+    
 -- A detector is "compatible" with a bore if when the amplifier corners
--- are touching the inner bore, the active region is more than 50 mils
+-- are touching the inner bore, the active region is more than tol mils
 -- from the bore wall.
-compatible :: Detector -> MagnetBore -> Bool
-compatible d (MagnetBore {boreRadius = r}) 
-  | ((2*r) - y_base) > (detectorHeight d + 100) = True
-  | otherwise           = False                           
-    where
-      y_base = WU.leg r (quot (ampWidth d) 4)
+compatible :: Detector -> MagnetBore -> Integer -> Bool
+compatible d b tol
+  | headroom d b + tol < 0 = True
+  | otherwise              = False                           
       
+-- Calculates the available headroom for a detector in a bore      
+headroom :: Detector -> MagnetBore -> Integer     
+headroom d b = (detectorHeight d) - (ampCornerPoint d b) - (boreRadius b)
+                
 -- Tell us the answer!            
 main :: IO ()
 main = do
   putStrLn . show $ willItWork
   where
-    willItWork = compatible detector bore
+    willItWork = compatible detector bore 200
     detector = Detector {ampWidth = WP.kh3Width, 
                          ampLength = WP.kh3Length, 
                          ampDepth = WP.kh3Depth, 
-                         castBendCenterline = 0}
+                         castBendCenterline = 440}
     bore = MagnetBore {boreRadius = MP.stdBoreRadius}
